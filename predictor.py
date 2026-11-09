@@ -184,6 +184,23 @@ def send_telegram_alert(report_text: str):
     except Exception as e:
         print(f"⚠️ Erro ao enviar mensagem para o Telegram: {e}")
 
+def update_html_dashboard():
+    now_str = datetime.now().strftime("%d/%m/%Y às %H:%M")
+    if os.path.exists("index.html"):
+        with open("index.html", "r", encoding="utf-8") as f:
+            content = f.read()
+        import re
+        content = re.sub(
+            r'🔄 Atualizado:[^<]*',
+            f'🔄 Atualizado: {now_str}',
+            content
+        )
+        with open("index.html", "w", encoding="utf-8") as f:
+            f.write(content)
+        print("✅ index.html atualizado com nova data!")
+
 if __name__ == "__main__":
     report = generate_report()
+    update_html_dashboard()
     send_telegram_alert(report)
+

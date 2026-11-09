@@ -2,9 +2,9 @@ name: Previsões Automáticas da Liga Portugal
 
 on:
   schedule:
-    # Executa automaticamente todas as Segundas e Sextas às 09:00 UTC
-    - cron: '0 9 * * 1,5'
-  # Permite executar manualmente com 1 clique no GitHub
+    # Executa automaticamente Segundas, Quartas e Sextas às 09:00 UTC
+    - cron: '0 9 * * 1,3,5'
+  # Permite executar manualmente a qualquer hora com 1 clique no GitHub
   workflow_dispatch:
 
 permissions:
@@ -17,6 +17,8 @@ jobs:
     steps:
       - name: 📥 Clonar Repositório
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: 🐍 Configurar Python
         uses: actions/setup-python@v5
@@ -34,9 +36,9 @@ jobs:
         run: |
           python predictor.py
 
-      - name: 💾 Guardar e Fazer Commit das Novas Previsões
+      - name: 💾 Publicar Atualizações no GitHub e no Site Web
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add PREDICTIONS.md
-          git diff --quiet && git diff --staged --quiet || (git commit -m "🤖 [Automático] Atualização das previsões da Liga Portugal" && git push)
+          git add PREDICTIONS.md index.html
+          git diff --quiet && git diff --staged --quiet || (git commit -m "🤖 [Automático] Atualização das previsões e dashboard web" && git push origin main && git push origin main:gh-pages --force)
