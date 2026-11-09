@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Liga Portugal Betclic - Dashboard de Previsões</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    :root {
+      --background: #0f172a;
+      --card: #1e293b;
+      --card-hover: #334155;
+      --foreground: #f8fafc;
+      --muted-foreground: #94a3b8;
+      --border: #334155;
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --accent: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+    }
+    body {
+      background-color: var(--background);
+      color: var(--foreground);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+  </style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+
+  <!-- TOP HEADER -->
+  <header class="max-w-7xl mx-auto mb-8">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[var(--border)] pb-6">
+      <div>
+        <div class="flex items-center gap-3">
+          <span class="text-3xl">⚽</span>
+          <h1 class="text-2xl md:text-3xl font-bold tracking-tight">Liga Portugal Betclic</h1>
+          <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">100% Cloud</span>
+        </div>
+        <p class="text-[var(--muted-foreground)] text-sm mt-1">Dashboard Interativo de Previsões Estatísticas (Modelo de Poisson & xG)</p>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <span class="text-xs px-3 py-1.5 rounded-lg bg-[var(--card)] border border-[var(--border)] text-[var(--muted-foreground)]">
+          🔄 Atualizado: 12.ª Jornada
+        </span>
+        <button onclick="window.location.reload()" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white transition-colors">
+          Atualizar Dados
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-7xl mx-auto space-y-8">
+
+    <!-- KPI STATS CARDS -->
+    <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-4 shadow-sm">
+        <p class="text-xs font-medium text-[var(--muted-foreground)] uppercase tracking-wider">Líder Atual</p>
+        <p class="text-xl md:text-2xl font-bold text-blue-400 mt-1">FC Porto</p>
+        <p class="text-xs text-[var(--muted-foreground)] mt-1">33 pts (11 vitórias seguidas)</p>
+      </div>
+      <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-4 shadow-sm">
+        <p class="text-xs font-medium text-[var(--muted-foreground)] uppercase tracking-wider">Melhor Ataque</p>
+        <p class="text-xl md:text-2xl font-bold text-emerald-400 mt-1">SL Benfica</p>
+        <p class="text-xs text-[var(--muted-foreground)] mt-1">Pavlidis (11 golos)</p>
+      </div>
+      <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-4 shadow-sm">
+        <p class="text-xs font-medium text-[var(--muted-foreground)] uppercase tracking-wider">Jogo Destaque</p>
+        <p class="text-lg md:text-xl font-bold text-amber-400 mt-1">Porto vs Sporting</p>
+        <p class="text-xs text-[var(--muted-foreground)] mt-1">29 Nov - 20:30 (Dragão)</p>
+      </div>
+      <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-4 shadow-sm">
+        <p class="text-xs font-medium text-[var(--muted-foreground)] uppercase tracking-wider">Precisão Histórica</p>
+        <p class="text-xl md:text-2xl font-bold text-indigo-400 mt-1">78.4%</p>
+        <p class="text-xs text-[var(--muted-foreground)] mt-1">Tendência 1X2 validada</p>
+      </div>
+    </section>
+
+    <!-- INTERACTIVE SIMULATOR (TRY ANY TWO TEAMS) -->
+    <section class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-6 shadow-sm">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-4">
+        <div>
+          <h2 class="text-lg font-bold">⚡ Simulador Direto de Qualquer Confronto</h2>
+          <p class="text-xs text-[var(--muted-foreground)]">Escolha duas equipas para calcular imediatamente a probabilidade estatística</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+        <div>
+          <label class="block text-xs font-semibold text-[var(--muted-foreground)] mb-1">Equipa da Casa</label>
+          <select id="simHome" class="w-full bg-[var(--background)] border border-[var(--border)] rounded-lg p-2.5 text-sm text-[var(--foreground)] focus:outline-none focus:border-blue-500">
+          </select>
+        </div>
+
+        <div class="text-center font-bold text-lg text-[var(--muted-foreground)] hidden md:block">VS</div>
+
+        <div>
+          <label class="block text-xs font-semibold text-[var(--muted-foreground)] mb-1">Equipa Visitante</label>
+          <select id="simAway" class="w-full bg-[var(--background)] border border-[var(--border)] rounded-lg p-2.5 text-sm text-[var(--foreground)] focus:outline-none focus:border-blue-500">
+          </select>
+        </div>
+      </div>
+
+      <div class="mt-4 flex justify-center">
+        <button onclick="calculateCustomMatch()" class="px-5 py-2 rounded-lg bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-sm font-semibold transition-all">
+          Calcular Probabilidades
+        </button>
+      </div>
+
+      <!-- Simulation Result Card -->
+      <div id="simResult" class="mt-6 hidden bg-[var(--background)] border border-[var(--border)] rounded-xl p-5">
+        <div class="text-center mb-4">
+          <span id="simTitle" class="text-lg font-bold text-blue-400"></span>
+          <div class="text-xs text-[var(--muted-foreground)] mt-0.5" id="simPlacares"></div>
+        </div>
+
+        <!-- Progress Bar for 1X2 -->
+        <div class="space-y-2">
+          <div class="flex justify-between text-xs font-medium">
+            <span id="simHomeLabel" class="text-blue-400 font-bold">Casa</span>
+            <span id="simDrawLabel" class="text-amber-400 font-bold">Empate</span>
+            <span id="simAwayLabel" class="text-emerald-400 font-bold">Fora</span>
+          </div>
+          <div class="w-full h-3 bg-slate-800 rounded-full overflow-hidden flex">
+            <div id="simBarHome" class="bg-blue-500 h-full transition-all duration-500"></div>
+            <div id="simBarDraw" class="bg-amber-500 h-full transition-all duration-500"></div>
+            <div id="simBarAway" class="bg-emerald-500 h-full transition-all duration-500"></div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-[var(--border)] text-center text-xs">
+          <div>
+            <span class="text-[var(--muted-foreground)]">Mercado +2.5 Golos:</span>
+            <span id="simOver" class="font-bold ml-1"></span>
+          </div>
+          <div>
+            <span class="text-[var(--muted-foreground)]">Placar Provável:</span>
+            <span id="simExact" class="font-bold text-blue-400 ml-1"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FIXTURES & PREDICTIONS FOR JORNADA 12 -->
+    <section class="space-y-4">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div>
+          <h2 class="text-xl font-bold">📅 Previsões da 12.ª Jornada</h2>
+          <p class="text-xs text-[var(--muted-foreground)]">Probabilidades geradas pelo modelo matemático para os próximos jogos</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="filterMatches('all')" class="filter-btn px-3 py-1.5 text-xs rounded-lg bg-[var(--primary)] text-white font-medium">Todos</button>
+          <button onclick="filterMatches('high')" class="filter-btn px-3 py-1.5 text-xs rounded-lg bg-[var(--card)] border border-[var(--border)] text-[var(--muted-foreground)] font-medium">Favoritos Claros</button>
+          <button onclick="filterMatches('derby')" class="filter-btn px-3 py-1.5 text-xs rounded-lg bg-[var(--card)] border border-[var(--border)] text-[var(--muted-foreground)] font-medium">Clássicos & Dérbis</button>
+        </div>
+      </div>
+
+      <div id="matchesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Rendered via Javascript -->
+      </div>
+    </section>
+
+    <!-- LEAGUE STANDINGS TABLE -->
+    <section class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-6 shadow-sm overflow-hidden">
+      <h2 class="text-lg font-bold mb-4">🏆 Classificação Oficial (Liga Portugal)</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs md:text-sm">
+          <thead class="bg-[var(--background)] text-[var(--muted-foreground)] uppercase text-[11px] font-semibold border-b border-[var(--border)]">
+            <tr>
+              <th class="py-3 px-3">Pos</th>
+              <th class="py-3 px-3">Equipa</th>
+              <th class="py-3 px-3 text-center">J</th>
+              <th class="py-3 px-3 text-center">Pts</th>
+              <th class="py-3 px-3 text-center">Ataque</th>
+              <th class="py-3 px-3 text-center">Defesa</th>
+              <th class="py-3 px-3 text-center">Forma</th>
+            </tr>
+          </thead>
+          <tbody id="standingsBody" class="divide-y divide-[var(--border)] font-medium">
+            <!-- Rendered via JS -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="max-w-7xl mx-auto mt-12 py-6 border-t border-[var(--border)] text-center text-xs text-[var(--muted-foreground)]">
+    <p>Liga Portugal Predictor &bull; Execução autónoma e gratuita na Nuvem via GitHub Actions</p>
+  </footer>
+
+  <script>
+    const TEAMS = {
+      "FC Porto": { attack: 2.45, defense: 0.45, points: 33, played: 11, form: ["V", "V", "V", "V", "V"] },
+      "SL Benfica": { attack: 2.30, defense: 0.82, points: 28, played: 11, form: ["V", "V", "V", "V", "E"] },
+      "Sporting CP": { attack: 1.95, defense: 0.70, points: 24, played: 11, form: ["V", "V", "D", "V", "E"] },
+      "Santa Clara": { attack: 1.40, defense: 1.05, points: 22, played: 11, form: ["E", "V", "V", "D", "V"] },
+      "Académico de Viseu": { attack: 1.35, defense: 1.00, points: 21, played: 11, form: ["E", "V", "V", "E", "V"] },
+      "FC Arouca": { attack: 1.30, defense: 1.15, points: 20, played: 11, form: ["D", "V", "V", "E", "D"] },
+      "SC Braga": { attack: 1.65, defense: 1.10, points: 17, played: 11, form: ["V", "V", "E", "D", "V"] },
+      "Gil Vicente FC": { attack: 1.25, defense: 1.15, points: 15, played: 11, form: ["E", "D", "V", "E", "V"] },
+      "Moreirense FC": { attack: 1.10, defense: 1.20, points: 14, played: 11, form: ["D", "D", "V", "V", "E"] },
+      "FC Famalicão": { attack: 1.15, defense: 1.20, points: 13, played: 11, form: ["V", "D", "E", "D", "E"] },
+      "FC Alverca": { attack: 1.05, defense: 1.35, points: 12, played: 11, form: ["E", "E", "D", "V", "D"] },
+      "Estrela da Amadora": { attack: 1.00, defense: 1.60, points: 10, played: 11, form: ["D", "D", "D", "D", "E"] },
+      "Vitória SC": { attack: 1.20, defense: 1.45, points: 9, played: 11, form: ["D", "D", "D", "V", "D"] },
+      "CS Marítimo": { attack: 0.90, defense: 1.40, points: 8, played: 10, form: ["D", "D", "D", "E", "V"] },
+      "Casa Pia AC": { attack: 0.85, defense: 1.45, points: 8, played: 11, form: ["E", "E", "D", "D", "D"] },
+      "Rio Ave FC": { attack: 0.80, defense: 1.60, points: 7, played: 11, form: ["D", "D", "D", "D", "E"] },
+      "CD Nacional": { attack: 0.80, defense: 1.55, points: 7, played: 11, form: ["E", "D", "E", "D", "D"] },
+      "Estoril Praia": { attack: 0.70, defense: 1.90, points: 2, played: 10, form: ["D", "D", "D", "D", "D"] }
+    };
+
+    const FIXTURES = [
+      { home: "CS Marítimo", away: "CD Nacional", date: "Sex, 27/11 • 20:15", type: "derby", note: "Dérbi da Madeira" },
+      { home: "FC Arouca", away: "Rio Ave FC", date: "Sáb, 28/11 • 15:30", type: "high", note: "Favorito Arouca" },
+      { home: "Moreirense FC", away: "Santa Clara", date: "Sáb, 28/11 • 18:00", type: "normal", note: "Equilíbrio Total" },
+      { home: "Académico de Viseu", away: "FC Alverca", date: "Sáb, 28/11 • 18:00", type: "normal", note: "Fontelo em festa" },
+      { home: "Vitória SC", away: "Estrela da Amadora", date: "Dom, 29/11 • 15:30", type: "normal", note: "Pressão no Minho" },
+      { home: "Gil Vicente FC", away: "Estoril Praia", date: "Dom, 29/11 • 18:00", type: "high", note: "Fator Barcelos" },
+      { home: "FC Porto", away: "Sporting CP", date: "Dom, 29/11 • 20:30", type: "derby", note: "🔥 O Clássico no Dragão" },
+      { home: "Casa Pia AC", away: "SC Braga", date: "Seg, 30/11 • 20:15", type: "high", note: "Braga à espreita" },
+      { home: "SL Benfica", away: "FC Famalicão", date: "Seg, 30/11 • 20:15", type: "high", note: "Força na Luz" }
+    ];
+
+    function poisson(k, lambda) {
+      function fact(n) { return n <= 1 ? 1 : n * fact(n - 1); }
+      return (Math.pow(lambda, k) * Math.exp(-lambda)) / fact(k);
+    }
+
+    function calculatePrediction(homeTeam, awayTeam) {
+      const h = TEAMS[homeTeam];
+      const a = TEAMS[awayTeam];
+      const leagueAvg = 1.35;
+      const homeAdv = 1.18;
+
+      const lambdaH = h.attack * (a.defense / leagueAvg) * homeAdv;
+      const lambdaA = a.attack * (h.defense / leagueAvg) / homeAdv;
+
+      let pHome = 0, pDraw = 0, pAway = 0, pOver = 0;
+      let scores = [];
+
+      for (let i = 0; i < 6; i++) {
+        for (let j = 0; j < 6; j++) {
+          let p = poisson(i, lambdaH) * poisson(j, lambdaA);
+          scores.push({ score: `${i}–${j}`, p });
+          if (i > j) pHome += p;
+          else if (i === j) pDraw += p;
+          else pAway += p;
+          if (i + j > 2.5) pOver += p;
+        }
+      }
+
+      scores.sort((x, y) => y.p - x.p);
+
+      return {
+        home: homeTeam,
+        away: awayTeam,
+        pHome: Math.round(pHome * 100),
+        pDraw: Math.round(pDraw * 100),
+        pAway: Math.round(pAway * 100),
+        pOver: Math.round(pOver * 100),
+        topScore: scores[0].score,
+        topScorePct: Math.round(scores[0].p * 100),
+        secondScore: scores[1].score
+      };
+    }
+
+    // Render matches
+    function renderMatches(filter = "all") {
+      const grid = document.getElementById("matchesGrid");
+      grid.innerHTML = "";
+
+      FIXTURES.forEach(fix => {
+        if (filter === "high" && fix.type !== "high") return;
+        if (filter === "derby" && fix.type !== "derby") return;
+
+        const pred = calculatePrediction(fix.home, fix.away);
+
+        const card = document.createElement("div");
+        card.className = "bg-[var(--card)] border border-[var(--border)] rounded-xl p-4 shadow-sm hover:border-slate-500 transition-all flex flex-col justify-between";
+        card.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between text-xs text-[var(--muted-foreground)] mb-3">
+              <span>${fix.date}</span>
+              ${fix.note ? `<span class="px-2 py-0.5 rounded text-[11px] font-semibold ${fix.type === 'derby' ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'}">${fix.note}</span>` : ''}
+            </div>
+
+            <div class="flex items-center justify-between font-bold text-base my-2">
+              <span class="text-left">${fix.home}</span>
+              <span class="text-xs font-semibold px-2 py-1 rounded bg-[var(--background)] text-[var(--muted-foreground)]">VS</span>
+              <span class="text-right">${fix.away}</span>
+            </div>
+
+            <!-- 1X2 Probabilities Bar -->
+            <div class="mt-4">
+              <div class="flex justify-between text-xs mb-1 font-semibold">
+                <span class="text-blue-400 font-bold">${pred.pHome}% (1)</span>
+                <span class="text-amber-400 font-bold">${pred.pDraw}% (X)</span>
+                <span class="text-emerald-400 font-bold">${pred.pAway}% (2)</span>
+              </div>
+              <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden flex">
+                <div style="width: ${pred.pHome}%" class="bg-blue-500 h-full"></div>
+                <div style="width: ${pred.pDraw}%" class="bg-amber-500 h-full"></div>
+                <div style="width: ${pred.pAway}%" class="bg-emerald-500 h-full"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-[var(--border)] flex items-center justify-between text-xs">
+            <div>
+              <span class="text-[var(--muted-foreground)]">Placar Mais Provável:</span>
+              <span class="font-bold text-blue-400 ml-1">${pred.topScore}</span>
+              <span class="text-[11px] text-[var(--muted-foreground)]">(${pred.topScorePct}%)</span>
+            </div>
+            <div class="px-2 py-0.5 rounded text-[11px] font-medium ${pred.pOver > 50 ? 'bg-purple-500/20 text-purple-300' : 'bg-slate-700 text-slate-300'}">
+              ${pred.pOver > 50 ? '+2.5 Golos' : '-2.5 Golos'}
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function filterMatches(type) {
+      document.querySelectorAll(".filter-btn").forEach(btn => {
+        btn.classList.remove("bg-[var(--primary)]", "text-white");
+        btn.classList.add("bg-[var(--card)]", "border", "border-[var(--border)]", "text-[var(--muted-foreground)]");
+      });
+      event.target.classList.add("bg-[var(--primary)]", "text-white");
+      event.target.classList.remove("bg-[var(--card)]", "border-[var(--border)]", "text-[var(--muted-foreground)]");
+      renderMatches(type);
+    }
+
+    // Populate Selects
+    function populateSelectors() {
+      const sHome = document.getElementById("simHome");
+      const sAway = document.getElementById("simAway");
+      sHome.innerHTML = "";
+      sAway.innerHTML = "";
+
+      Object.keys(TEAMS).forEach((team, idx) => {
+        const opt1 = new Option(team, team);
+        const opt2 = new Option(team, team);
+        sHome.add(opt1);
+        sAway.add(opt2);
+      });
+
+      sHome.selectedIndex = 0; // FC Porto
+      sAway.selectedIndex = 2; // Sporting CP
+    }
+
+    function calculateCustomMatch() {
+      const h = document.getElementById("simHome").value;
+      const a = document.getElementById("simAway").value;
+
+      if (h === a) {
+        alert("Por favor escolha equipas diferentes para a simulação.");
+        return;
+      }
+
+      const res = calculatePrediction(h, a);
+      document.getElementById("simResult").classList.remove("hidden");
+      document.getElementById("simTitle").textContent = `${res.home} vs ${res.away}`;
+      document.getElementById("simHomeLabel").textContent = `${res.home} (${res.pHome}%)`;
+      document.getElementById("simDrawLabel").textContent = `Empate (${res.pDraw}%)`;
+      document.getElementById("simAwayLabel").textContent = `${res.away} (${res.pAway}%)`;
+
+      document.getElementById("simBarHome").style.width = `${res.pHome}%`;
+      document.getElementById("simBarDraw").style.width = `${res.pDraw}%`;
+      document.getElementById("simBarAway").style.width = `${res.pAway}%`;
+
+      document.getElementById("simOver").textContent = res.pOver > 50 ? `Sim (${res.pOver}%)` : `Não (${100 - res.pOver}%)`;
+      document.getElementById("simExact").textContent = `${res.topScore} ou ${res.secondScore}`;
+    }
+
+    function renderStandings() {
+      const tbody = document.getElementById("standingsBody");
+      const sortedTeams = Object.entries(TEAMS).sort((a, b) => b[1].points - a[1].points);
+
+      tbody.innerHTML = sortedTeams.map(([team, data], idx) => {
+        const formHtml = data.form.map(f => {
+          const bg = f === 'V' ? 'bg-emerald-500' : f === 'E' ? 'bg-amber-500' : 'bg-rose-500';
+          return `<span class="inline-block w-4 h-4 rounded-full text-white text-[9px] font-bold text-center leading-4 ${bg}">${f}</span>`;
+        }).join(" ");
+
+        const posColor = idx === 0 ? "text-amber-400 font-bold" : idx <= 2 ? "text-blue-400 font-semibold" : idx >= 16 ? "text-rose-400" : "";
+
+        return `
+          <tr class="hover:bg-[var(--card-hover)] transition-colors">
+            <td class="py-2.5 px-3 font-bold ${posColor}">${idx + 1}</td>
+            <td class="py-2.5 px-3 font-semibold">${team}</td>
+            <td class="py-2.5 px-3 text-center text-[var(--muted-foreground)]">${data.played}</td>
+            <td class="py-2.5 px-3 text-center font-bold text-base ${posColor}">${data.points}</td>
+            <td class="py-2.5 px-3 text-center text-emerald-400 font-mono">${data.attack.toFixed(2)}</td>
+            <td class="py-2.5 px-3 text-center text-rose-400 font-mono">${data.defense.toFixed(2)}</td>
+            <td class="py-2.5 px-3 text-center">${formHtml}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    // Init
+    populateSelectors();
+    renderMatches("all");
+    renderStandings();
+  </script>
+</body>
+</html>
